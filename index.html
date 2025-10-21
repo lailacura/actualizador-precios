@@ -50,59 +50,59 @@
 
   </div>
 
-  <script>
-    function updatePrices() {
-    const text = document.getElementById("priceList").value;
-    const type = document.getElementById("increaseType").value;
-    const value = parseFloat(document.getElementById("increaseValue").value);
+<script>
+function updatePrices() {
+  const text = document.getElementById("priceList").value;
+  const type = document.getElementById("increaseType").value;
+  const value = parseFloat(document.getElementById("increaseValue").value);
 
-    if (isNaN(value)) {
-        alert("Por favor ingresa un valor numérico válido para el aumento.");
-        return;
+  if (isNaN(value)) {
+    alert("Por favor ingresa un valor numérico válido para el aumento.");
+    return;
+  }
+
+  // Detecta SOLO números que vienen después de un símbolo $
+  const updated = text.replace(/\$(\d+(?:[.,]\d+)?)/g, (match, num) => {
+    const number = parseFloat(num.replace(",", "."));
+    if (isNaN(number)) return match;
+
+    let newNumber = number;
+    if (type === "monto") {
+      newNumber += value;
+    } else {
+      newNumber += number * (value / 100);
     }
 
-    // Busca números dentro de *...* (por ejemplo *$650*)
-    const updated = text.replace(/\*[^*0-9]*([0-9]+[.,]?[0-9]*)[^*]*\*/g, (match, num) => {
-        const number = parseFloat(num.replace(",", "."));
-        if (isNaN(number)) return match;
+    // Redondea sin decimales
+    const rounded = Math.round(newNumber);
 
-        let newNumber = number;
-        if (type === "monto") {
-        newNumber += value;
-        } else {
-        newNumber += number * (value / 100);
-        }
+    // Devuelve el formato original con el nuevo número
+    return `$${rounded}`;
+  });
 
-        // Redondea sin decimales
-        const rounded = Math.round(newNumber);
+  document.getElementById("result").textContent = updated;
 
-        // Reemplaza el número dentro del formato original
-        return match.replace(num, rounded);
+  // Oculta mensaje de copia anterior
+  document.getElementById("copyMessage").classList.add("hidden");
+}
+
+function copyResult() {
+  const resultText = document.getElementById("result").textContent;
+  if (!resultText.trim()) {
+    alert("No hay texto para copiar. Actualiza la lista primero.");
+    return;
+  }
+
+  navigator.clipboard.writeText(resultText)
+    .then(() => {
+      const message = document.getElementById("copyMessage");
+      message.classList.remove("hidden");
+      setTimeout(() => message.classList.add("hidden"), 2000);
+    })
+    .catch(err => {
+      alert("No se pudo copiar el texto: " + err);
     });
-
-    document.getElementById("result").textContent = updated;
-
-    // Oculta mensaje de copia anterior si existe
-    document.getElementById("copyMessage").classList.add("hidden");
-    }
-
-    function copyResult() {
-    const resultText = document.getElementById("result").textContent;
-    if (!resultText.trim()) {
-        alert("No hay texto para copiar. Actualiza la lista primero.");
-        return;
-    }
-
-    navigator.clipboard.writeText(resultText)
-        .then(() => {
-        const message = document.getElementById("copyMessage");
-        message.classList.remove("hidden");
-        setTimeout(() => message.classList.add("hidden"), 2000);
-        })
-        .catch(err => {
-        alert("No se pudo copiar el texto: " + err);
-        });
-    }
+}
 </script>
 
 
